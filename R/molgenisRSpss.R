@@ -57,7 +57,7 @@ molgenis.job.status <- local(function(job.url) {
 molgenis.import.csv.metadata <- local(function() {
   import.url <- paste0(molgenis.spss.host, "/plugin/importwizard/importFile")
   response <- httr::POST(url = import.url, 
-                         add_headers("x-molgenis-token" = molgenis.token),
+                         add_headers("x-molgenis-token" = molgenis.spss.token),
                          body = list(action="add", file=upload_file("attributes.csv", "text/csv")))
   response <- httr::content(response, as = "text", encoding = "UTF-8")
   response <- jsonlite::fromJSON(response)
