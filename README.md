@@ -1,95 +1,65 @@
 ## MOLGENIS R-spss
 
-The MOLGENIS R-spss can load an SPSS-file into MOLGENIS, creating an EntityType and loading data into that EntityType.
+The MOLGENIS R-spss can import an SPSS-file into MOLGENIS, creating an EntityType and importing data into that EntityType.
 
 ## Usage
+As an example we will import the sample *experim.sav* into a MOLGENIS instance.
 
-You can import this project by executing:
-
-```r
-library(molgenisRSpss)
-```
-
-When you want to install the package and it's depodencies automatically you can execute:
-
+First you have to install the package, so type in the console:
 ```r
 install.packages("molgenisRSpss", dependencies = TRUE)
 ```
 
+Then you can import this library by executing:
+```r
+library(molgenisRSpss)
+```
+
 This will import the right dependencies when you have installed them in your own environment.
 
-With ```molgenis.spss.``` you can view which functions are available to use with a MOLGENIS instance.
-
-## Development
-
-With the devtools and the roxygen2 library you can develop on this package. By importing the two libraries you can document the code and generate other dev-stuff.
-
+**note**
+This package will not work without the molgenisRApi. You have to import it by executing this command:
 ```r
-library(devtools)
-library(roxygen2)
+library(molgenisRApi)
 ```
 
-You can install the R-pacakge via Github when you have loaded the devtools-package (see above). Just run:
-
+First we define the host in which we import the SPSS file(s).
 ```r
-install_github("#username#/#repo#")
+host <- "https://molgenis01.gcc.rug.nl"
 ```
 
-Example:
-
+Now we have to login to a MOLGENIS instance, we use the host variable to specify the host.
 ```r
-install_github("sidohaakma/molgenis-client-r-spss")
+token <- molgenis.login(host, "admin", "admin")
 ```
 
-## Releasing
-
-To release you have to make sure all warnings are removed during the build.
-
-### Set right locale 
-
-Enter in your R-terminal
-
+We use the token and the host to import the experim.sav file into molgenis01.
 ```r
-Sys.setenv(TZ="Europe/Amsterdam")
+molgenis.spss.import(host, token, "/samples/experim.sav")
 ```
 
-This will prevent this warning:
+You will get the following output:
+```
+EntityType metadata for: [ experim.sav ] is successfully build (entityType: [ experim ])
+The job to import entityType has finished successfully
+SPSS-file: [ experim ] is successfully imported as: [ base_experim ]
+```
 
+The file is now imported in molgenis01. You can view it by search for *"experim"* in the DataExplorer
+
+## Methods
+The SPSS public interface is now described.
+
+### molgenis.spss.import
 ```r
-Warning in as.POSIXlt.POSIXct(x, tz) : unknown timezone 'zone/tz/2017c.1.0/zoneinfo/Europe/Amsterdam'
+molgenis.spss.import("host name", "token", "file")
 ```
 
-### Set the right encoding
+You have to login to molgenis first before you can import a file into a molgenis instance.
 
-Go to "Tools --> Global options"
-
-![Tools](man/img/release/menubar.png)
-
-![Global options](man/img/release/globaloptions.png)
-
-
-Go to "Code --> Saving"
-
-![Code option](man/img/release/code.png)
-
-Set UTF-8 in encoding field. This will prevent
-
-```
-Warning messages: 
-  Setting LC_CTYPE failed, using "C" 
-  Setting LC_COLLATE failed, using "C" 
-  Setting LC_TIME failed, using "C" 
-  Setting LC_MESSAGES failed, using "C" 
-  Setting LC_MONETARY failed, using "C" 
-```
-
-### Expose use methods in NAMESPACE
-
-To get rid of NOTE's in the "check-phase" of the build you have to add exposure tags in the documentation. You can do this by adding:
-
+**Examples**
 ```r
-@importFrom #package# #method1# #method2# #method3# #method4#
-@importFrom #package# #method5# #method6# etc..
+host <- "https://molgenis01.gcc.rug.nl"
+token <- molgenis.login(host, "admin", "admin")
+molgenis.spss.import(host, token, "samples/spss-file.sav")
 ```
-
-You can add upto 4 methods per line. Then run ```devtools::document()``` to write the new NAMESPACE-file.

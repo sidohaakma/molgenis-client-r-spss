@@ -16,8 +16,6 @@ local({
 #' @param job.url job URL which can be used to check the status
 #' 
 #' @return the job status (FINISHED, RUNNING or FAILED)
-#' 
-#' @export
 molgenis.job.status <- local(function(job.url) {
   url <- paste0(molgenis.spss.host, gsub("\"", "", job.url, fixed=T))
   finished = "false"
