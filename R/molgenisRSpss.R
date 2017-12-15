@@ -1,14 +1,3 @@
-library(foreign)
-library(RCurl)
-library(rjson)
-library(httr)
-library(ff)
-library(molgenisRApi)
-
-options(scipen=999)
-options(tz="Europe/Amsterdam")
-Sys.setenv(TZ="Europe/Amsterdam")
-
 molgenis.spss.env <- new.env()
 
 local({
@@ -35,7 +24,7 @@ molgenis.job.status <- local(function(job.url) {
   while (finished == "false") {
     response <- httr::GET(url = url)
     response <- httr::content(response, as = "text", encoding = "UTF-8")
-    response <- jsonlite::fromJSON(response)
+    response <- rjson::fromJSON(response)
     status <- response$status
     if(status == "FINISHED") {
       finished = "true"
@@ -53,6 +42,8 @@ molgenis.job.status <- local(function(job.url) {
 #' 
 #' Default file-name importing for metadata is attributes.csv
 #' 
+#' @importFrom httr add_headers upload_file
+#' 
 #' @return the importer job url
 molgenis.import.csv.metadata <- local(function() {
   import.url <- paste0(molgenis.spss.host, "/plugin/importwizard/importFile")
@@ -60,7 +51,7 @@ molgenis.import.csv.metadata <- local(function() {
                          add_headers("x-molgenis-token" = molgenis.spss.token),
                          body = list(action="add", file=upload_file("attributes.csv", "text/csv")))
   response <- httr::content(response, as = "text", encoding = "UTF-8")
-  response <- jsonlite::fromJSON(response)
+  response <- rjson::fromJSON(response)
   return(response)
 }, molgenis.spss.env)
 
@@ -70,11 +61,13 @@ molgenis.import.csv.metadata <- local(function() {
 #' The REST API of MOLGENIS cannot create table-metadata and therefor we create a CSV-file to import in the
 #' importer
 #' 
-#' @param file.name SPSS-file name
-#' @param data SPSS data matrix
+#' @param spss.file.name SPSS-file name
+#' @param spss.data SPSS data matrix
+#' 
+#' @importFrom utils write.csv
 #' 
 #' @return the entity type name to import
-molgenis.import.csv.create.metadata <- local(function(spss.file.name, spss.data) {
+molgenis.spss.create.metadata <- local(function(spss.file.name, spss.data) {
   attributes <- colnames(spss.data)
   entity.type <- tools::file_path_sans_ext(spss.file.name)
   data.type <- "string"
@@ -105,15 +98,18 @@ molgenis.import.csv.create.metadata <- local(function(spss.file.name, spss.data)
 #' @param molgenis.token molgenis token
 #' @param spss.file SPSS-file to import
 #' 
+#' @importFrom foreign read.spss
+#' @importFrom molgenisRApi molgenis.addAll
+#' 
 #' @export
-molgenis.import.spss <- local(function(molgenis.host, molgenis.token, spss.file) {
+molgenis.spss.import <- local(function(molgenis.host, molgenis.token, spss.file) {
   molgenis.spss.host <<- molgenis.host
   molgenis.spss.token <<- molgenis.token
   if(is.null(molgenis.spss.token) || molgenis.spss.token == "") {
     stop(paste0("Please login with the MOLGENIS R API (molgenis.login(#host#, #username#, #password#)\n"))
   }
   spss.data <- read.spss(spss.file, use.value.labels=TRUE, to.data.frame=TRUE)
-  entity.type <- molgenis.import.csv.create.metadata(basename(spss.file), spss.data)
+  entity.type <- molgenis.spss.create.metadata(basename(spss.file), spss.data)
   job.url <- molgenis.import.csv.metadata()
   molgenis.job.status(job.url)
   package.entity.type = paste0("base_", entity.type)

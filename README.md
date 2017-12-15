@@ -1,0 +1,84 @@
+## MOLGENIS R-spss
+
+The MOLGENIS R-spss can load an SPSS-file into MOLGENIS, creating an EntityType and loading data into that EntityType.
+
+## Usage
+
+You can import this project by executing:
+
+```r
+library(molgenisRSpss)
+```
+
+When you want to install the package and it's depodencies automatically you can execute:
+
+```r
+install.packages("molgenisRSpss", dependencies = TRUE)
+```
+
+This will import the right dependencies when you have installed them in your own environment.
+
+With ```molgenis.spss.``` you can view which functions are available to use with a MOLGENIS instance.
+
+## Development
+
+With the devtools and the roxygen2 library you can develop on this package. By importing the two libraries you can document the code and generate other dev-stuff.
+
+```r
+library(devtools)
+library(roxygen2)
+```
+
+You can install the R-pacakge via Github when you have loaded the devtools-package (see above). Just run:
+
+```r
+install_github("#username#/#repo#")
+```
+
+Example:
+
+```r
+install_github("sidohaakma/molgenis-client-r-spss")
+```
+
+## Releasing
+
+To release you have to make sure all warnings are removed during the build.
+
+### Set right locale 
+
+Enter in your R-terminal
+
+```r
+Sys.setenv(TZ="Europe/Amsterdam")
+```
+
+This will prevent this warning:
+
+```r
+Warning in as.POSIXlt.POSIXct(x, tz) : unknown timezone 'zone/tz/2017c.1.0/zoneinfo/Europe/Amsterdam'
+```
+
+### Set the right encoding
+
+Go to "Tools --> Global options"
+
+![Tools](man/img/release/menubar.png)
+
+![Global options](man/img/release/globaloptions.png)
+
+
+Go to "Code --> Saving"
+
+![Code option](man/img/release/code.png)
+
+Set UTF-8 in encoding field. This will prevent
+
+```
+Warning messages: 
+  Setting LC_CTYPE failed, using "C" 
+  Setting LC_COLLATE failed, using "C" 
+  Setting LC_TIME failed, using "C" 
+  Setting LC_MESSAGES failed, using "C" 
+  Setting LC_MONETARY failed, using "C" 
+```

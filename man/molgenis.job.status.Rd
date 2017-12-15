@@ -8,8 +8,6 @@ molgenis.job.status(job.url)
 }
 \arguments{
 \item{job.url}{job URL which can be used to check the status}
-
-\item{entity.type}{entityType that has to be imported}
 }
 \value{
 the job status (FINISHED, RUNNING or FAILED)
